@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:file:./db/shareit
+    username: share
+    password: it
+#    url: ${DB_URL:jdbc:postgresql://localhost:${DB_PORT}/${DB_NAME}}
+#    username: ${DB_USER}
+#    password: ${DB_PASSWORD}
+  h2:
+    console:
+      enabled: true
+  sql:
+     init:
+       mode: always
+       encoding: UTF-8
+  jpa:
+    generate-ddl: true
+    show_sql: true
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: on
+
+logging:
+  level:
+    org:
+      springframework:
+        orm:
+          jpa: INFO
+          JpaTransactionManager: DEBUG
+      transaction: INFO
+      interceptor: TRACE

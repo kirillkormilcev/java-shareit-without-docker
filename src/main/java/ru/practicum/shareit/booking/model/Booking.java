@@ -1,35 +1,35 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.booking.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.review.model.Review;
+import ru.practicum.shareit.booking.dto.Status;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.util.List;
+import java.time.LocalDateTime;
 
+/**
+ * TODO Sprint add-bookings.
+ */
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @Entity
-@Table(name = "items")
+@Table(name = "bookings")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
-public class Item {
+public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
-    String name;
-    String description;
-    Boolean available;
+    LocalDateTime start;
+    LocalDateTime ending;
     @OneToOne(cascade = CascadeType.ALL)
-    User owner;
+    Item item;
     @OneToOne(cascade = CascadeType.ALL)
-    ItemRequest itemRequest;
-    @OneToMany(cascade = CascadeType.ALL)
-    @ToString.Exclude
-    List<Review> reviews;
+    User booker;
+    @Enumerated
+    Status status;
 }
