@@ -52,7 +52,7 @@ public class ItemService {
         return itemDao.findItemByOwnerId(userId).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
-    public List<ItemDto> searchAvailableItemsByPartOfName(String text, long userId) {
+    public List<ItemDto> searchAvailableItemsByPartOfNameOrDescription(String text, long userId) {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }

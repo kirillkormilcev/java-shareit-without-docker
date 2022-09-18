@@ -32,4 +32,11 @@ public class ErrorHandler {
         return new ResponseEntity<>(new ErrorResponse("Не корректно(-ы)е поле(-я) пользователя.", e.getMessage()),
                 HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleThrowable(final Throwable e) {
+        log.warn(e.getMessage(), e);
+        return new ResponseEntity<>(new ErrorResponse("Неожиданная ошибка.", e.getMessage()),
+                HttpStatus.BAD_GATEWAY);
+    }
 }

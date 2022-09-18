@@ -53,6 +53,6 @@ public class ItemController {
     public ResponseEntity<List<ItemDto>> searchItems(@RequestParam(name = "text") String text,
                                                      @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Обработка эндпойнта GET /items/search?text=" + text + "(X-Sharer-User-Id=" + userId + ").");
-        return new ResponseEntity<>(itemService.searchAvailableItemsByPartOfName(text, userId), HttpStatus.OK);
+        return new ResponseEntity<>(itemService.searchAvailableItemsByPartOfNameOrDescription(text, userId), HttpStatus.OK);
     }
 }
