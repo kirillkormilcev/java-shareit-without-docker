@@ -9,6 +9,7 @@ import ru.practicum.shareit.error.exception.IncorrectRequestParamException;
 import ru.practicum.shareit.error.exception.NotFoundException;
 import ru.practicum.shareit.error.exception.UserValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,9 +39,10 @@ public class UserService {
         if (userDto == null) {
             throw new IncorrectRequestParamException("На обновление поступил null пользователь.");
         }
-        updateNotNullField(userDto, getUserById(userId));
-        userDto.setId(userId);
-        return UserMapper.toUserDto(userDao.save(UserMapper.toUser(userDto)));
+        User userFromDao = userDao.findById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь с индексом " + userId + " не найден в базе."));
+        updateNotNullField(UserMapper.toUser(userDto), userFromDao);
+        return UserMapper.toUserDto(userDao.save(userFromDao));
     }
 
     public void deleteUserById(long userId) {
@@ -48,12 +50,12 @@ public class UserService {
         userDao.deleteById(userId);
     }
 
-    private void updateNotNullField(UserDto userDto, UserDto userDtoFromDao) {
-        if (userDto.getName() == null) {
-            userDto.setName(userDtoFromDao.getName());
+    private void updateNotNullField(User user, User userFromDao) {
+        if (user.getName() != null) {
+            userFromDao.setName(user.getName());
         }
-        if (userDto.getEmail() == null) {
-            userDto.setEmail(userDtoFromDao.getEmail());
+        if (user.getEmail() != null) {
+            userFromDao.setEmail(user.getEmail());
         }
     }
 

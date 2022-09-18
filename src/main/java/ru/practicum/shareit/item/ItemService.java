@@ -39,10 +39,8 @@ public class ItemService {
         if (userId != itemFromDao.getOwner().getId()) {
             throw new NotFoundException("Редактировать вещь имеет право только хозяин.");
         }
-        updateNotNullField(itemDto, ItemMapper.toItemDto(itemFromDao));
-        itemDto.setOwner(itemFromDao.getOwner());
-        itemDto.setId(itemId);
-        return ItemMapper.toItemDto(itemDao.save(ItemMapper.toItem(itemDto)));
+        updateNotNullField(ItemMapper.toItem(itemDto), itemFromDao);
+        return ItemMapper.toItemDto(itemDao.save(itemFromDao));
     }
 
     public ItemDto getItemById(long itemId) {
@@ -62,15 +60,15 @@ public class ItemService {
                 .map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
-    private void updateNotNullField(ItemDto itemDto, ItemDto itemDtoFromDao) {
-        if (itemDto.getName() == null) {
-            itemDto.setName(itemDtoFromDao.getName());
+    private void updateNotNullField(Item item, Item itemFromDao) {
+        if (item.getName() != null) {
+            itemFromDao.setName(item.getName());
         }
-        if (itemDto.getDescription() == null) {
-            itemDto.setDescription(itemDtoFromDao.getDescription());
+        if (item.getDescription() != null) {
+            itemFromDao.setDescription(item.getDescription());
         }
-        if (itemDto.getAvailable() == null) {
-            itemDto.setAvailable(itemDtoFromDao.getAvailable());
+        if (item.getAvailable() != null) {
+            itemFromDao.setAvailable(item.getAvailable());
         }
     }
 }
