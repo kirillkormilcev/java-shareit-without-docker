@@ -1,4 +1,4 @@
-package ru.practicum.shareit.review;
+package ru.practicum.shareit.request;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -6,12 +6,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
-@RequestMapping(path = "/users")
+@RequestMapping(path = "/requests")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ReviewController {
+public class RequestController {
 }

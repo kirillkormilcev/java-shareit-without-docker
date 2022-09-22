@@ -2,12 +2,10 @@ package ru.practicum.shareit.item.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.review.model.Review;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Getter
 @Setter
@@ -25,11 +23,8 @@ public class Item {
     String name;
     String description;
     Boolean available;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     User owner;
-    @OneToOne(cascade = CascadeType.ALL)
-    ItemRequest itemRequest;
-    @OneToMany(cascade = CascadeType.ALL)
-    @ToString.Exclude
-    List<Review> reviews;
+    @OneToOne //TODO возможно ManyToOne, выяснить на соответствующем спринте
+    Request request;
 }

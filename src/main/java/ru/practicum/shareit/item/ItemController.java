@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemDtoIn;
+import ru.practicum.shareit.item.dto.ItemDtoOut;
 import ru.practicum.shareit.error.validation.Create;
 import ru.practicum.shareit.error.validation.Update;
 
@@ -23,36 +25,45 @@ public class ItemController {
     final ItemService itemService;
 
     @PostMapping
-    public ResponseEntity<ItemDto> addItem(@Validated({Create.class}) @RequestBody ItemDto itemDto,
-                                           @RequestHeader("X-Sharer-User-Id") long userId) { //todo validated
+    public ResponseEntity<ItemDtoOut> addItem(@Validated({Create.class}) @RequestBody ItemDtoIn itemDtoIn,
+                                              @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Обработка эндпойнта POST /items(X-Sharer-User-Id=" + userId + ").");
-        return new ResponseEntity<>(itemService.addItemToStorage(itemDto, userId), HttpStatus.OK);
+        return new ResponseEntity<>(itemService.addItem(itemDtoIn, userId), HttpStatus.OK);
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity<ItemDto> updateItem(@PathVariable long itemId,
-                                              @Validated({Update.class}) @RequestBody ItemDto itemDto,
-                                              @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ResponseEntity<ItemDtoOut> updateItem(@PathVariable long itemId,
+                                                 @Validated({Update.class}) @RequestBody ItemDtoIn itemDtoIn,
+                                                 @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Обработка эндпойнта PATCH /items/" + itemId + "(X-Sharer-User-Id=" + userId + ").");
-        return new ResponseEntity<>(itemService.updateItem(itemDto, itemId, userId), HttpStatus.OK);
+        return new ResponseEntity<>(itemService.updateItem(itemDtoIn, itemId, userId), HttpStatus.OK);
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getItem(@PathVariable long itemId) {
-        log.info("Обработка эндпойнта GET /items/" + itemId + ".");
-        return new ResponseEntity<>(itemService.getItemById(itemId), HttpStatus.OK);
+    public ResponseEntity<ItemDtoOut> getItem(@PathVariable long itemId,
+                                              @RequestHeader("X-Sharer-User-Id") long userId) {
+        log.info("Обработка эндпойнта GET /items/(X-Sharer-User-Id=" + userId + ")" + itemId + ".");
+        return new ResponseEntity<>(itemService.getItemById(itemId, userId), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getItems(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public ResponseEntity<List<ItemDtoOut>> getItems(@RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Обработка эндпойнта GET /items(X-Sharer-User-Id=" + userId + ").");
         return new ResponseEntity<>(itemService.getItemsByUserId(userId), HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ItemDto>> searchItems(@RequestParam(name = "text") String text,
-                                                     @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ResponseEntity<List<ItemDtoOut>> searchItems(@RequestParam(name = "text") String text,
+                                                        @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Обработка эндпойнта GET /items/search?text=" + text + "(X-Sharer-User-Id=" + userId + ").");
         return new ResponseEntity<>(itemService.searchAvailableItemsByPartOfNameOrDescription(text, userId), HttpStatus.OK);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public ResponseEntity<CommentDto> addComment(@RequestHeader("X-Sharer-User-Id") long userId,
+                                                 @PathVariable long itemId,
+                                                 @Validated({Create.class}) @RequestBody CommentDto commentDto) {
+        log.info("Обработка эндпойнта POST /items/{itemId=" + itemId + "}/comment(X-Sharer-User-Id=" + userId + ").");
+        return new ResponseEntity<>(itemService.addComment(userId, itemId, commentDto), HttpStatus.OK);
     }
 }

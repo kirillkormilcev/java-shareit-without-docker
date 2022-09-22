@@ -14,9 +14,6 @@ import ru.practicum.shareit.error.validation.Update;
 
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Slf4j
 @RestController
 @RequestMapping(path = "/users")
@@ -26,7 +23,7 @@ public class UserController {
     final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> addUser(@Validated({Create.class}) @RequestBody UserDto userDto) { //todo validated
+    public ResponseEntity<UserDto> addUser(@Validated({Create.class}) @RequestBody UserDto userDto) {
         log.info("Обработка эндпойнта POST /users.");
         return new ResponseEntity<>(userService.addUserToStorage(userDto), HttpStatus.OK);
     }

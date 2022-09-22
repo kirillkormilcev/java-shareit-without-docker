@@ -1,4 +1,4 @@
-package ru.practicum.shareit.review.dto;
+package ru.practicum.shareit.booking.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,7 +9,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewDto {
+@ToString
+public class BookingDtoOutForItem {
     long id;
-    String review;
+    Long bookerId;
 }

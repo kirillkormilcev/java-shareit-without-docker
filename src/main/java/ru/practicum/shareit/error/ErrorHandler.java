@@ -6,9 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.error.exception.IncorrectRequestParamException;
-import ru.practicum.shareit.error.exception.NotFoundException;
-import ru.practicum.shareit.error.exception.UserValidationException;
+import ru.practicum.shareit.error.exception.*;
 
 @RestControllerAdvice
 @Slf4j
@@ -45,6 +43,27 @@ public class ErrorHandler {
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         log.warn(e.getMessage(), e);
         return new ResponseEntity<>(new ErrorResponse("Не корректно(-ы)е поле(-я) пользователя.", e.getMessage()),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleItemValidationException(final ItemValidationException e) {
+        log.warn(e.getMessage(), e);
+        return new ResponseEntity<>(new ErrorResponse("Проблема с бронируемой вещью.", e.getMessage()),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleBookingValidationException(final BookingValidationException e) {
+        log.warn(e.getMessage(), e);
+        return new ResponseEntity<>(new ErrorResponse("Проблема с бронью.", e.getMessage()),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleIncorrectStatusException(final IncorrectStatusException e) {
+        log.warn(e.getMessage(), e);
+        return new ResponseEntity<>(new ErrorResponse("Unknown state: UNSUPPORTED_STATUS", e.getMessage()),
                 HttpStatus.BAD_REQUEST);
     }
 }

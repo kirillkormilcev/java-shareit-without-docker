@@ -4,20 +4,22 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.user.model.User;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @Getter
 @Setter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemRequestDto {
+public class RequestDto {
     long id;
+    @NotBlank
     String description;
+    @NotNull
     User requestor;
-    LocalDateTime created;
+    @Builder.Default
+    LocalDateTime created = LocalDateTime.now();
 }

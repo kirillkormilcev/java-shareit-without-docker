@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.error.exception.IncorrectRequestParamException;
 import ru.practicum.shareit.error.exception.NotFoundException;
-import ru.practicum.shareit.error.exception.UserValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
@@ -18,50 +18,38 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Transactional(readOnly = true)
 public class UserService {
-    final UserDao userDao;
+    final UserRepository userRepository;
 
+    @Transactional
     public UserDto addUserToStorage(UserDto userDto) {
-        checkEmail(userDto);
-        return UserMapper.toUserDto(userDao.save(UserMapper.toUser(userDto)));
+        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
     public UserDto getUserById(long userId) {
-        return UserMapper.toUserDto(userDao.findById(userId).orElseThrow(() ->
+        return UserMapper.toUserDto(userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с индексом " + userId + " не найден в базе.")));
     }
 
     public List<UserDto> getAllUsers() {
-        return userDao.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
+    @Transactional
     public UserDto updateUser(UserDto userDto, long userId) {
         if (userDto == null) {
             throw new IncorrectRequestParamException("На обновление поступил null пользователь.");
         }
-        User userFromDao = userDao.findById(userId).orElseThrow(() ->
+        User userFromDao = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с индексом " + userId + " не найден в базе."));
-        updateNotNullField(UserMapper.toUser(userDto), userFromDao);
-        return UserMapper.toUserDto(userDao.save(userFromDao));
+        UserMapper.updateNotNullField(UserMapper.toUser(userDto), userFromDao);
+        return UserMapper.toUserDto(userRepository.save(userFromDao));
     }
 
+    @Transactional
     public void deleteUserById(long userId) {
         getUserById(userId);
-        userDao.deleteById(userId);
-    }
-
-    private void updateNotNullField(User user, User userFromDao) {
-        if (user.getName() != null) {
-            userFromDao.setName(user.getName());
-        }
-        if (user.getEmail() != null) {
-            userFromDao.setEmail(user.getEmail());
-        }
-    }
-
-    private void checkEmail(UserDto userDto) {
-        if (userDao.getAllEmails().contains(userDto.getEmail())) {
-            throw new UserValidationException("Пользователь с почтой " + userDto.getEmail() + " уже зарегистрирован.");
-        }
+        userRepository.deleteById(userId);
     }
 }
