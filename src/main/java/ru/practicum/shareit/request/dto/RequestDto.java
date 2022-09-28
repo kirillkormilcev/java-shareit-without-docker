@@ -2,7 +2,7 @@ package ru.practicum.shareit.request.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -19,7 +19,7 @@ public class RequestDto {
     @NotBlank
     String description;
     @NotNull
-    User requestor;
+    UserDto requestor;
     @Builder.Default
     LocalDateTime created = LocalDateTime.now();
 }

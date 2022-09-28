@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.comment;
 
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -10,7 +11,7 @@ public class CommentMapper {
         return CommentDto.builder()
                 .id(comment.getId())
                 .text(comment.getText())
-                .item(comment.getItem() != null ? comment.getItem() : null)
+                .item(comment.getItem() != null ? ItemMapper.toItemDtoOut(comment.getItem()) : null)
                 .authorName(comment.getAuthor() != null ? comment.getAuthor().getName() : null)
                 .created(comment.getCreated())
                 .build();
