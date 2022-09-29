@@ -19,4 +19,13 @@ public class UserMapper {
                 .email(userDto.getEmail())
                 .build();
     }
+
+    public static void updateNotNullField(User user, User userFromRepo) {
+        if (user.getName() != null) {
+            userFromRepo.setName(user.getName());
+        }
+        if (user.getEmail() != null) {
+            userFromRepo.setEmail(user.getEmail());
+        }
+    }
 }

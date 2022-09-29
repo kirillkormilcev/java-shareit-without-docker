@@ -2,14 +2,10 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.review.model.Review;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.error.validation.Create;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Getter
 @Setter
@@ -18,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ItemDto {
+public class ItemDtoIn {
     long id;
     @NotBlank(groups = {Create.class})
     String name;
@@ -26,7 +22,5 @@ public class ItemDto {
     String description;
     @NotNull(groups = {Create.class})
     Boolean available;
-    User owner;
-    ItemRequest itemRequest;
-    List<Review> reviews;
+    //Request request; //todo возможно понадобится в будущем
 }
