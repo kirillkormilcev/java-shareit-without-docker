@@ -1,11 +1,11 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.request.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.error.validation.Create;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -13,14 +13,10 @@ import javax.validation.constraints.NotNull;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class ItemDtoIn {
+public class RequestDtoIn {
     long id;
     @NotBlank(groups = {Create.class})
-    String name;
-    @NotBlank(groups = {Create.class})
     String description;
-    @NotNull(groups = {Create.class})
-    Boolean available;
-    Long requestId;
+    @Builder.Default
+    LocalDateTime created = LocalDateTime.now();
 }

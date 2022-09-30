@@ -2,11 +2,11 @@ package ru.practicum.shareit.request.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.item.dto.ItemDtoOut;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,12 +14,10 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestDto {
+public class RequestDtoOut {
     long id;
-    @NotBlank
     String description;
-    @NotNull
     UserDto requestor;
-    @Builder.Default
-    LocalDateTime created = LocalDateTime.now();
+    LocalDateTime created;
+    List<ItemDtoOut> items;
 }

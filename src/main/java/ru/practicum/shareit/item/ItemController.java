@@ -14,6 +14,8 @@ import ru.practicum.shareit.item.dto.ItemDtoOut;
 import ru.practicum.shareit.error.validation.Create;
 import ru.practicum.shareit.error.validation.Update;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -47,16 +49,24 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDtoOut>> getItems(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public ResponseEntity<List<ItemDtoOut>> getItems(@RequestHeader("X-Sharer-User-Id") long userId,
+                                                     @PositiveOrZero @RequestParam(name = "from", required = false,
+                                                             defaultValue = "0") Integer from,
+                                                     @Positive @RequestParam(name = "size", required = false,
+                                                             defaultValue = "10") Integer size) {
         log.info("Обработка эндпойнта GET /items(X-Sharer-User-Id=" + userId + ").");
-        return new ResponseEntity<>(itemService.getItemsByUserId(userId), HttpStatus.OK);
+        return new ResponseEntity<>(itemService.getItemsByUserId(userId, from, size), HttpStatus.OK);
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<ItemDtoOut>> searchItems(@RequestParam(name = "text") String text,
-                                                        @RequestHeader("X-Sharer-User-Id") long userId) {
+                                                        @RequestHeader("X-Sharer-User-Id") long userId,
+                                                        @PositiveOrZero @RequestParam(name = "from", required = false,
+                                                                defaultValue = "0") Integer from,
+                                                        @Positive @RequestParam(name = "size", required = false,
+                                                                defaultValue = "10") Integer size) {
         log.info("Обработка эндпойнта GET /items/search?text=" + text + "(X-Sharer-User-Id=" + userId + ").");
-        return new ResponseEntity<>(itemService.searchAvailableItemsByPartOfNameOrDescription(text, userId), HttpStatus.OK);
+        return new ResponseEntity<>(itemService.searchAvailableItemsByPartOfNameOrDescription(text, userId, from, size), HttpStatus.OK);
     }
 
     @PostMapping("/{itemId}/comment")

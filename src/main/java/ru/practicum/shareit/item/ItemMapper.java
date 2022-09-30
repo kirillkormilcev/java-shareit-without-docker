@@ -10,14 +10,14 @@ import ru.practicum.shareit.user.model.User;
 import java.util.List;
 
 public class ItemMapper {
+
     public static ItemDtoOut toItemDtoOut(Item item) {
         return ItemDtoOut.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                //.request(item.getRequest() != null ? item.getRequest() : null)
-                // todo возможно понадобится в будущем
+                .requestId(item.getRequest() != null ? item.getRequest().getId() : null)
                 .build();
     }
 
@@ -27,8 +27,6 @@ public class ItemMapper {
                 .name(itemDtoIn.getName())
                 .description(itemDtoIn.getDescription())
                 .available(itemDtoIn.getAvailable())
-                //.request(itemDtoIn.getRequest() != null ? itemDtoIn.getRequest() : null)
-                // todo возможно понадобится в будущем
                 .build();
     }
 

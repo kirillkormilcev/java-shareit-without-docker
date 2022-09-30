@@ -13,6 +13,8 @@ import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.dto.State;
 import ru.practicum.shareit.error.validation.Create;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -48,17 +50,27 @@ public class BookingController {
 
     @GetMapping
     public ResponseEntity<List<BookingDtoOut>> getAllBookingOfUser(@RequestParam(name = "state", required = false,
-            defaultValue = "ALL") String state, @RequestHeader("X-Sharer-User-Id") long userId) {
-        log.info("Обработка эндпойнта GET /bookings/(X-Sharer-User-Id=" + userId + ").");
+            defaultValue = "ALL") String state,
+                                                                   @RequestHeader("X-Sharer-User-Id") long userId,
+                                                                   @PositiveOrZero @RequestParam(name = "from", required = false,
+                                                                           defaultValue = "0") Integer from,
+                                                                   @Positive @RequestParam(name = "size", required = false,
+                                                                           defaultValue = "10") Integer size) {
+        log.info("Обработка эндпойнта GET /bookings?state=" + state + "(X-Sharer-User-Id=" + userId + ").");
         return new ResponseEntity<>(bookingService.getBookingsByUserId(State.stringToEnum(state.toUpperCase()),
-                userId), HttpStatus.OK);
+                userId, from, size), HttpStatus.OK);
     }
 
     @GetMapping("/owner")
     public ResponseEntity<List<BookingDtoOut>> getAllBookingOfOwner(@RequestParam(name = "state", required = false,
-            defaultValue = "ALL") String state, @RequestHeader("X-Sharer-User-Id") long ownerId) {
-        log.info("Обработка эндпойнта GET /bookings/(X-Sharer-User-Id=" + ownerId + ").");
+            defaultValue = "ALL") String state,
+                                                                    @RequestHeader("X-Sharer-User-Id") long ownerId,
+                                                                    @PositiveOrZero @RequestParam(name = "from", required = false,
+                                                                            defaultValue = "0") Integer from,
+                                                                    @Positive @RequestParam(name = "size", required = false,
+                                                                            defaultValue = "10") Integer size) {
+        log.info("Обработка эндпойнта GET /bookings/owner?state=" + state + "(X-Sharer-User-Id=" + ownerId + ").");
         return new ResponseEntity<>(bookingService.getBookingsByOwnerId(State.stringToEnum(state.toUpperCase()),
-                ownerId), HttpStatus.OK);
+                ownerId, from, size), HttpStatus.OK);
     }
 }

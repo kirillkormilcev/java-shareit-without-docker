@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,11 +13,15 @@ import java.util.List;
 @Repository
 @RepositoryRestResource
 public interface ItemRepository extends JpaRepository<Item, Long> {
+    List<Item> findItemByOwnerId(long userId, PageRequest pageRequest);
+
     List<Item> findItemByOwnerId(long userId, Sort sort);
 
     @Query("select i from Item i " +
             "where upper(i.name) like upper(concat('%', ?1, '%')) " +
             "or upper(i.description) like upper(concat('%', ?1, '%')) " +
             "and i.available = true ")
-    List<Item> searchItemByText(String text);
+    List<Item> searchItemByText(String text, PageRequest pageRequest);
+
+    List<Item> findByRequestId(long id);
 }
