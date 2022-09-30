@@ -44,11 +44,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByItemIdInAndStatusIs(List<Long> itemIdsByOwnerId, Status waiting, Sort sort);
 
-    Optional<Booking> findFirstByItemIdAndStartBefore(long itemId, LocalDateTime now, Sort sort);
+    Optional<Booking> findFirstByItemIdAndStartBeforeAndStatus(long itemId, LocalDateTime now, Sort sort, Status status);
 
     @Query("select b from Booking b " +
             "where b.item.id = ?1 " +
             "and b.start > ?2 " +
+            "and b.status = 'APPROVED' " +
             "order by b.start desc ")
     Optional<Booking> findFirstNextBooking(long itemId, LocalDateTime now);
 
@@ -57,4 +58,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "and b.booker.id = ?1 " +
             "and  b.ending < current_timestamp ")
     Optional<Booking> findEndBookingOfItemByUser(long userId, long itemId);
+
+    @Query("select count (b.id) from Booking b " +
+            "where b.status = ?1 " +
+            "and b.item.id = ?2 " +
+            "and ((?3 between b.start and b.ending) or (?4 between b.start and b.ending) " +
+            "or (?3 < b.start and ?4 > b.ending))")
+    Integer findIntersectedBookings(Status approved, long itemId, LocalDateTime start, LocalDateTime ending);
 }

@@ -35,7 +35,7 @@ public class BookingService {
 
     @Transactional
     public BookingDtoOut addBooking(BookingDtoIn bookingDtoIn, long userId) {
-        Item item = isItemAvailable(bookingDtoIn.getItemId());
+        Item item = isItemAvailable(bookingDtoIn);
         if (item.getOwner().getId() == userId) {
             throw new NotFoundException("Нельзя арендовать у самого себя.");
         }
@@ -165,12 +165,14 @@ public class BookingService {
         }
     }
 
-    private Item isItemAvailable(long itemId) {
-        Item item = itemRepository.findById(itemId).orElseThrow(() ->
-                new NotFoundException("Вещь с индексом " + itemId + " не найдена в базе."));
-        if (!item.getAvailable()) {
-            throw new ItemValidationException("Вещь с индексом " + itemId + " в настоящий момент не доступна.");
+    private Item isItemAvailable(BookingDtoIn bookingDtoIn) {
+        long itemId = bookingDtoIn.getItemId();
+        Item item = findItemById(itemId);
+        if (!item.getAvailable() || bookingRepository.findIntersectedBookings(Status.APPROVED, itemId,
+                bookingDtoIn.getStart(), bookingDtoIn.getEnding()) > 0) {
+            throw new ItemValidationException("Вещь с индексом " + bookingDtoIn.getItemId() + " в настоящий момент не доступна.");
         }
+
         return item;
     }
 

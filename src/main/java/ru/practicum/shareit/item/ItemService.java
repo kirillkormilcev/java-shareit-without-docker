@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.error.exception.IncorrectRequestParamException;
 import ru.practicum.shareit.error.exception.NotFoundException;
 import ru.practicum.shareit.item.comment.CommentMapper;
@@ -126,7 +127,7 @@ public class ItemService {
     }
 
     private Optional<Booking> findLastBookingOfItem(long itemId, LocalDateTime now) {
-        return bookingRepository.findFirstByItemIdAndStartBefore(itemId, now, Sort.by("start"));
+        return bookingRepository.findFirstByItemIdAndStartBeforeAndStatus(itemId, now, Sort.by("start"), Status.APPROVED);
     }
 
     private Optional<Booking> findNextBookingOfItem(long itemId, LocalDateTime now) {
