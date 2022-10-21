@@ -25,6 +25,6 @@ public class Item {
     Boolean available;
     @ManyToOne(cascade = CascadeType.ALL)
     User owner;
-    @OneToOne //TODO возможно ManyToOne, выяснить на соответствующем спринте
+    @ManyToOne(cascade = CascadeType.ALL)
     Request request;
 }

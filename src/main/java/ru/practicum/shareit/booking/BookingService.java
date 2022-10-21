@@ -4,9 +4,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.common.PageRequestModified;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.dto.State;
@@ -19,6 +21,7 @@ import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -75,38 +78,35 @@ public class BookingService {
         return BookingMapper.toBookingDtoOut(booking);
     }
 
-    public List<BookingDtoOut> getBookingsByUserId(State state, long userId) {
+    public List<BookingDtoOut> getBookingsByUserId(State state, long userId, Integer from, Integer size) {
         findUserById(userId);
         LocalDateTime now = LocalDateTime.now();
-        List<Booking> result;
-        Sort sort = Sort.by("start").descending();
+        List<Booking> result = new ArrayList<>();
+        final PageRequest pageRequest = new PageRequestModified(from, size, Sort.by("start").descending());
         switch (state) {
             case ALL:
-                result = bookingRepository.findByBookerId(userId, sort);
+                result = bookingRepository.findByBookerId(userId, pageRequest);
                 break;
             case CURRENT:
-                result = bookingRepository.findCurrentBookingsByBookerId(userId);
+                result = bookingRepository.findCurrentBookingsByBookerId(userId, pageRequest);
                 break;
             case PAST:
-                result = bookingRepository.findByBookerIdAndEndingBefore(userId, now, sort);
+                result = bookingRepository.findByBookerIdAndEndingBefore(userId, now, pageRequest);
                 break;
             case FUTURE:
-                result = bookingRepository.findByBookerIdAndStartAfter(userId, now, sort);
+                result = bookingRepository.findByBookerIdAndStartAfter(userId, now, pageRequest);
                 break;
             case WAITING:
-                result = bookingRepository.findByBookerIdAndStatusIs(userId, Status.WAITING, sort);
+                result = bookingRepository.findByBookerIdAndStatusIs(userId, Status.WAITING, pageRequest);
                 break;
             case REJECTED:
-                result = bookingRepository.findByBookerIdAndStatusIs(userId, Status.REJECTED, sort);
+                result = bookingRepository.findByBookerIdAndStatusIs(userId, Status.REJECTED, pageRequest);
                 break;
-            default:
-                throw new IncorrectStatusException("При запросе пользователем его бронирований указан не верный" +
-                        " параметр state = " + state + ".");
         }
         return result.stream().map(BookingMapper::toBookingDtoOut).collect(Collectors.toList());
     }
 
-    public List<BookingDtoOut> getBookingsByOwnerId(State state, long ownerId) {
+    public List<BookingDtoOut> getBookingsByOwnerId(State state, long ownerId, Integer from, Integer size) {
         findUserById(ownerId);
         LocalDateTime now = LocalDateTime.now();
         List<Long> itemIdsByOwnerId = itemRepository.findItemByOwnerId(ownerId, Sort.by("id")).stream().map(Item::getId)
@@ -114,30 +114,27 @@ public class BookingService {
         if (itemIdsByOwnerId.size() == 0) {
             throw new NotFoundException("Вы не владеете ни одной вещью.");
         }
-        List<Booking> result;
-        Sort sort = Sort.by("start").descending();
+        List<Booking> result = new ArrayList<>();
+        final PageRequest pageRequest = new PageRequestModified(from, size, Sort.by("start").descending());
         switch (state) {
             case ALL:
-                result = bookingRepository.findByOwnerId(itemIdsByOwnerId);
+                result = bookingRepository.findByOwnerId(itemIdsByOwnerId, pageRequest);
                 break;
             case CURRENT:
-                result = bookingRepository.findCurrentBookingsByOwnerId(itemIdsByOwnerId);
+                result = bookingRepository.findCurrentBookingsByOwnerId(itemIdsByOwnerId, pageRequest);
                 break;
             case PAST:
-                result = bookingRepository.findByItemIdInAndEndingBefore(itemIdsByOwnerId, now, sort);
+                result = bookingRepository.findByItemIdInAndEndingBefore(itemIdsByOwnerId, now, pageRequest);
                 break;
             case FUTURE:
-                result = bookingRepository.findByItemIdInAndStartAfter(itemIdsByOwnerId, now, sort);
+                result = bookingRepository.findByItemIdInAndStartAfter(itemIdsByOwnerId, now, pageRequest);
                 break;
             case WAITING:
-                result = bookingRepository.findByItemIdInAndStatusIs(itemIdsByOwnerId, Status.WAITING, sort);
+                result = bookingRepository.findByItemIdInAndStatusIs(itemIdsByOwnerId, Status.WAITING, pageRequest);
                 break;
             case REJECTED:
-                result = bookingRepository.findByItemIdInAndStatusIs(itemIdsByOwnerId, Status.REJECTED, sort);
+                result = bookingRepository.findByItemIdInAndStatusIs(itemIdsByOwnerId, Status.REJECTED, pageRequest);
                 break;
-            default:
-                throw new IncorrectStatusException("При запросе собственником бронирований его вещей указан не " +
-                        "верный параметр state = " + state + ".");
         }
         return result.stream().map(BookingMapper::toBookingDtoOut).collect(Collectors.toList());
     }
@@ -179,5 +176,13 @@ public class BookingService {
     private User findUserById(long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с индексом " + userId + " не найден в базе."));
+    }
+
+    public UserRepository getUserRepository() {
+        return userRepository;
+    }
+
+    public ItemRepository getItemRepository() {
+        return itemRepository;
     }
 }

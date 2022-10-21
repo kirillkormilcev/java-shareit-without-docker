@@ -18,7 +18,7 @@ public class ItemDtoOut {
     String name;
     String description;
     Boolean available;
-    //Request request; // todo возможно понадобится в будущем
+    Long requestId;
     BookingDtoOutForItem lastBooking;
     BookingDtoOutForItem nextBooking;
     List<CommentDto> comments;

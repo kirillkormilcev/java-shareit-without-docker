@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,36 +14,36 @@ import java.util.Optional;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findByBookerId(long userId, Sort sort);
+    List<Booking> findByBookerId(long userId, PageRequest pageRequest);
 
     @Query("select b from Booking b " +
             "where b.booker.id = ?1 " +
             "and current_timestamp between b.start and b.ending " +
             "order by b.start desc")
-    List<Booking> findCurrentBookingsByBookerId(long userId);
+    List<Booking> findCurrentBookingsByBookerId(long userId, PageRequest pageRequest);
 
-    List<Booking> findByBookerIdAndEndingBefore(long userId, LocalDateTime now, Sort sort);
+    List<Booking> findByBookerIdAndEndingBefore(long userId, LocalDateTime now, PageRequest pageRequest);
 
-    List<Booking> findByBookerIdAndStartAfter(long userId, LocalDateTime now, Sort sort);
+    List<Booking> findByBookerIdAndStartAfter(long userId, LocalDateTime now, PageRequest pageRequest);
 
-    List<Booking> findByBookerIdAndStatusIs(long userId, Status waiting, Sort sort);
+    List<Booking> findByBookerIdAndStatusIs(long userId, Status waiting, PageRequest pageRequest);
 
     @Query("select b from Booking b " +
             "where b.item.id in ?1 " +
             "order by b.start desc")
-    List<Booking> findByOwnerId(List<Long> itemIdsByOwnerId);
+    List<Booking> findByOwnerId(List<Long> itemIdsByOwnerId, PageRequest pageRequest);
 
     @Query("select b from Booking b " +
             "where b.item.id in ?1 " +
             "and current_timestamp between b.start and b.ending " +
             "order by b.start desc")
-    List<Booking> findCurrentBookingsByOwnerId(List<Long> itemIdsByOwnerId);
+    List<Booking> findCurrentBookingsByOwnerId(List<Long> itemIdsByOwnerId, PageRequest pageRequest);
 
-    List<Booking> findByItemIdInAndEndingBefore(List<Long> itemIdsByOwnerId, LocalDateTime now, Sort sort);
+    List<Booking> findByItemIdInAndEndingBefore(List<Long> itemIdsByOwnerId, LocalDateTime now, PageRequest pageRequest);
 
-    List<Booking> findByItemIdInAndStartAfter(List<Long> itemIdsByOwnerId, LocalDateTime now, Sort sort);
+    List<Booking> findByItemIdInAndStartAfter(List<Long> itemIdsByOwnerId, LocalDateTime now, PageRequest pageRequest);
 
-    List<Booking> findByItemIdInAndStatusIs(List<Long> itemIdsByOwnerId, Status waiting, Sort sort);
+    List<Booking> findByItemIdInAndStatusIs(List<Long> itemIdsByOwnerId, Status waiting, PageRequest pageRequest);
 
     Optional<Booking> findFirstByItemIdAndStartBeforeAndStatus(long itemId, LocalDateTime now, Sort sort, Status status);
 

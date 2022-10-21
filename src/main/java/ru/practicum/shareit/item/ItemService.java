@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.common.PageRequestModified;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.error.exception.IncorrectRequestParamException;
@@ -20,6 +21,7 @@ import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.dto.ItemDtoIn;
 import ru.practicum.shareit.item.dto.ItemDtoOut;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.RequestRepository;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
@@ -39,10 +41,14 @@ public class ItemService {
     final UserRepository userRepository;
     final BookingRepository bookingRepository;
     final CommentRepository commentRepository;
+    final RequestRepository requestRepository;
 
     @Transactional
     public ItemDtoOut addItem(ItemDtoIn itemDtoIn, long userId) {
         Item item = ItemMapper.toItem(itemDtoIn);
+        if (itemDtoIn.getRequestId() != null) {
+            setRequestToItem(item, itemDtoIn);
+        }
         ItemMapper.setOwner(item, findUserById(userId));
         return ItemMapper.toItemDtoOut(itemRepository.save(item));
     }
@@ -57,6 +63,9 @@ public class ItemService {
             throw new NotFoundException("Редактировать вещь имеет право только хозяин.");
         }
         ItemMapper.updateNotNullField(ItemMapper.toItem(itemDtoIn), itemFromRepo);
+        if (itemDtoIn.getRequestId() != null) {
+            setRequestToItem(itemFromRepo, itemDtoIn);
+        }
         return ItemMapper.toItemDtoOut(itemRepository.save(itemFromRepo));
     }
 
@@ -77,8 +86,9 @@ public class ItemService {
         return itemDtoOut;
     }
 
-    public List<ItemDtoOut> getItemsByUserId(long userId) {
-        List<Item> itemsByUserId = itemRepository.findItemByOwnerId(userId, Sort.by("id"));
+    public List<ItemDtoOut> getItemsByUserId(long userId, Integer from, Integer size) {
+        List<Item> itemsByUserId = itemRepository.findItemByOwnerId(userId,
+                new PageRequestModified(from, size, Sort.by("id")));
         LocalDateTime now = LocalDateTime.now();
         return itemsByUserId.stream().map((item) -> {
             ItemDtoOut itemDtoOut = ItemMapper.toItemDtoOut(item);
@@ -91,11 +101,11 @@ public class ItemService {
         }).collect(Collectors.toList());
     }
 
-    public List<ItemDtoOut> searchAvailableItemsByPartOfNameOrDescription(String text, long userId) {
+    public List<ItemDtoOut> searchAvailableItemsByPartOfNameOrDescription(String text, long userId, Integer from, Integer size) {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
-        return itemRepository.searchItemByText(text).stream()
+        return itemRepository.searchItemByText(text, new PageRequestModified(from, size, Sort.by("id"))).stream()
                 .map(ItemMapper::toItemDtoOut).collect(Collectors.toList());
     }
 
@@ -132,5 +142,30 @@ public class ItemService {
 
     private Optional<Booking> findNextBookingOfItem(long itemId, LocalDateTime now) {
         return bookingRepository.findFirstNextBooking(itemId, now);
+    }
+
+    private void setRequestToItem(Item item, ItemDtoIn itemDtoIn) {
+        item.setRequest(requestRepository.findById(itemDtoIn.getRequestId()).orElseThrow(() ->
+                new NotFoundException("Запрос с индексом " + itemDtoIn.getRequestId() + " не найден в базе.")));
+    }
+
+    public ItemRepository getItemRepository() {
+        return itemRepository;
+    }
+
+    public UserRepository getUserRepository() {
+        return userRepository;
+    }
+
+    public BookingRepository getBookingRepository() {
+        return bookingRepository;
+    }
+
+    public CommentRepository getCommentRepository() {
+        return commentRepository;
+    }
+
+    public RequestRepository getRequestRepository() {
+        return requestRepository;
     }
 }
